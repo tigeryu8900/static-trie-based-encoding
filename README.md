@@ -19,10 +19,10 @@ Read the [tutorial](https://cmake.org/cmake-tutorial/) if you want to contribute
 Build the project using this command:
 
 ```
-cmake -Spath/to/source -Bpath/to/build
+cmake -Hpath/to/source -Bpath/to/build
 ```
 
-`path/to/source` is the path to the source folder (which contains CMakeLists.txt), and `path/to/build` is the path to the build folder.
+`path/to/source` is the path to the source folder (which contains CMakeLists.txt), and `path/to/build` is the path to the build folder. Don't add a space between the paths and the tags.
 
 Go to the build folder and run `make` to make the project.
 
@@ -54,4 +54,4 @@ See also the list of [contributors](../../graphs/contributors) who participated 
 
 ## Acknowledgments
 
-* [facebook](https://github.com/facebook) for [coding.h](https://github.com/facebook/rocksdb/blob/master/util/coding.h) (slightly modified), [port.h](https://github.com/facebook/rocksdb/blob/master/port/port.x), [port_posix.h](https://github.com/facebook/rocksdb/blob/master/port/port_posix.h), and [port_posix.cc](https://github.com/facebook/rocksdb/blob/master/port/port_posix.cc).
+* [facebook](https://github.com/facebook) for [coding.h](https://github.com/facebook/rocksdb/blob/master/util/coding.h) (slightly modified), [port.h](https://github.com/facebook/rocksdb/blob/master/port/port.x), [port_posix.h](https://github.com/facebook/rocksdb/blob/master/port/port_posix.h), and [port_posix.cc](https://github.com/facebook/rocksdb/blob/master/port/port_posix.cc) (port_posix.h and port_posix.cc are merged into port.h).
