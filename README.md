@@ -54,5 +54,5 @@ See also the list of [contributors](../../graphs/contributors) who participated 
 
 ## Acknowledgments
 
-* [facebook](https://github.com/facebook) for [coding.h](https://github.com/facebook/rocksdb/blob/master/util/coding.h) (slightly modified), [port.h](https://github.com/facebook/rocksdb/blob/master/port/port.x), [port_posix.h](https://github.com/facebook/rocksdb/blob/master/port/port_posix.h), and [port_posix.cc](https://github.com/facebook/rocksdb/blob/master/port/port_posix.cc) (port_posix.h and port_posix.cc are merged into port.h).
-
+* [Facebook](https://github.com/facebook) for [coding.h](https://github.com/facebook/rocksdb/blob/master/util/coding.h) (slightly modified), [port.h](https://github.com/facebook/rocksdb/blob/master/port/port.x), [port_posix.h](https://github.com/facebook/rocksdb/blob/master/port/port_posix.h), and [port_posix.cc](https://github.com/facebook/rocksdb/blob/master/port/port_posix.cc) (port_posix.h and port_posix.cc are merged into port.h).
+* [Google](https://github.com/google) for [Google Test](https://github.com/google/googletest).
