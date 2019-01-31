@@ -33,19 +33,17 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
 endif()
 
 add_library(libstbe
-	coding.cpp
-	trie.cpp
-	memblock.cpp
-	stbe.cpp)
+	src/util/coding.cpp
+	src/trie.cpp
+	src/memblock.cpp
+	src/stbe.cpp)
 
 # Now simply link against gtest or gtest_main as needed. Eg
-add_executable(main main.cpp)
-target_link_libraries(main libstbe)
 
 # Setup testing
 enable_testing()
 #find_package(GTest REQUIRED)
-include_directories("${gtest_SOURCE_DIR}/include")
+include_directories("${gtest_SOURCE_DIR}/include" include src)
 
 # Add test cpp file
 add_executable(memblock_test

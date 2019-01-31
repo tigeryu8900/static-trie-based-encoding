@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "coding.h"
+#include "util/coding.h"
 
 constexpr int kM = 2;
 
@@ -33,7 +33,7 @@ public:
 
   void serialize(std::string* buf, size_t parent_pos);
 
-  void serialize(std::ostream& os, size_t parent_pos, uint32_t& pos);
+//  void serialize(std::ostream& os, size_t parent_pos, uint32_t& pos);
 
   void reset() {
     value_.clear();
@@ -53,7 +53,6 @@ public:
   void add(const std::string& value);
   void add(const std::vector<std::string>& values);
   std::string serialize();
-  void serialize(std::ostream& os);
   size_t numValues() {
     return value_nodes_.size();
   }

@@ -61,19 +61,19 @@ void TrieNode::serialize(std::string* buf, size_t parent_pos) {
     c->serialize(buf, position_);
   }
 }
-
+/*
 void TrieNode::serialize(std::ostream& os, size_t parent_pos, uint32_t& pos) {
   position_ = pos;
   std::string buf;
   PutVarint32Varint32(&buf, parent_pos, value_.size());
-  buf.append(value_);
-  os << buf;
-  pos += buf.size();
+  //buf.append(value_);
+  os << buf << value_;
+  pos += buf.size() + value_.size();
   for (auto& c : children_) {
     c->serialize(os, position_, pos);
   }
 }
-
+*/
 
 void Trie::add(const std::string& value) {
   value_nodes_.push_back(root_.add(value, 0));
@@ -92,12 +92,11 @@ std::ostream& operator<< (std::ostream &out, const Trie &trie) {
 std::string Trie::serialize() {
   std::string buf;
 
-  // Placeholder for header: total block length and values offset
-  PutFixed32(&buf, 0);
+  // Placeholder for values offset
   PutFixed32(&buf, 0); 
 
   // Serialize the root_
-  root_.serialize(&buf, 2 * sizeof(uint32_t));
+  root_.serialize(&buf, 0);
   uint32_t values_offset = buf.size();
 
   // Serialize value_nodes_
@@ -105,13 +104,8 @@ std::string Trie::serialize() {
     PutVarint32(&buf, n->getPosition());
   }
 
-  // Write header
-  EncodeFixed32(&buf[0], buf.size());
-  EncodeFixed32(&buf[sizeof(uint32_t)], values_offset);
+  // Write values offset
+  EncodeFixed32(&buf[0], values_offset);
   return buf;
-}
-
-void Trie::serialize(std::ostream& os) {
-  os << serialize(); 
 }
 

@@ -3,45 +3,44 @@
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "../trie.h"
-#include "../stbe.h"
+#include "trie.h"
+#include "stbe.h"
+#include "test_param.h"
+
 
 namespace stbe {
 
-TEST(trie_case, sample_test)
-{
-  struct {
-    std::vector<std::string> input;
-    std::string result;
-  } tests[] = {
-    { std::vector<std::string>{"abc", "abd"},
-      R"(0: 
-  1: ab
-    2: c
-    2: d
-)"
-    },
-    { std::vector<std::string>{"a", "aa", "abc", "aabc", "abcc"},
-      R"(0: 
-  1: a
-  1: aa
-    2: bc
-  1: abc
-    2: c
-)"
-    }
-  };
-  for (auto& t : tests) {
-    Builder builder("test_file", t.input);
 
-    std::cout << "Decoded values:" << std::endl;
-    Decoder decoder("test_file");
-    std::string value;
-    int i = 0;
-    while (decoder.nextValue(value)) {
-      std::cout << value << std::endl;
-    }
+class STBETest : public ::testing::TestWithParam<TestParam> {
+};
+
+
+TEST_P(STBETest, Decode)
+{
+  const TestParam& t = GetParam();
+  Builder builder;
+  builder.initialize("test_file");
+  builder.add(t.input);
+  builder.finalize();
+    
+  Decoder decoder("test_file");
+  ASSERT_EQ(t.input.size(), decoder.totalRecords()) << "Unmatched # of records.";
+  std::string value;
+  for (auto& ori_value : t.input) {
+    auto b = decoder.nextValue(value);
+    std::cout << "got: " << value << std::endl; 
+    ASSERT_TRUE(b) << "Unexpected end of values.";
+    EXPECT_EQ(ori_value, value);
   }
+  EXPECT_FALSE(decoder.nextValue(value)) << "Too many values than expected.";
+  
+  for (uint32_t i = 0 ; i < decoder.totalRecords(); ++i) {
+    EXPECT_EQ(t.input[i], decoder[i]);
+  }
+
+  EXPECT_EQ("", decoder[decoder.totalRecords()]) << "Too many values than expected.";
 }
+
+INSTANTIATE_TEST_SUITE_P(stbe, STBETest, ::testing::ValuesIn(tests));
 
 }  // namespace stbe

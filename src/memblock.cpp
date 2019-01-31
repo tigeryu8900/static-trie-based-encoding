@@ -10,12 +10,13 @@ Decoder::Decoder(const std::string& buf) : Decoder::Decoder(buf.data(), buf.size
 
 Decoder::Decoder() {}
 
-void Decoder::reset(const char* buf, size_t len) {
+bool Decoder::reset(const char* buf, size_t len) {
+  if (buf == nullptr || len <= sizeof(uint32_t)) return false;
   buf_ = buf;
   limit_ = buf_ + len;
-  block_size_ = DecodeFixed32(buf_);
-  values_offset_ = DecodeFixed32(buf_ + sizeof(uint32_t));
+  values_offset_ = DecodeFixed32(buf_);
   value_ptr_ = buf_ + values_offset_;
+  return true;
 }
 
 bool Decoder::nextValue(std::string& value) {
@@ -32,7 +33,7 @@ bool Decoder::nextValue(std::string& value) {
   if (value_ptr_ == nullptr) return false;
 
   std::vector<std::pair<const char*, uint32_t>> pieces;
-  while (node_pos > 2 * sizeof(uint32_t)) {  // header size == 2 * sizeof(uint32_t)
+  while (node_pos > sizeof(uint32_t)) {  // header size == sizeof(uint32_t)
     uint32_t len;
     const char* ptr = GetVarint32Ptr(buf_ + node_pos, limit_, &node_pos);
     ptr = GetVarint32Ptr(ptr, limit_, &len);
@@ -47,6 +48,16 @@ bool Decoder::nextValue(std::string& value) {
   }
 
   return true;
+}
+
+bool Decoder::skip(uint32_t num) {
+  uint32_t node_pos;
+  for (uint32_t i = 0; i < num; ++i) {
+    if (value_ptr_ == nullptr) return false;
+    // Get start position from value_ptr_, and advance it to next value.
+    value_ptr_ = GetVarint32Ptr(value_ptr_, limit_, &node_pos);
+  }
+  return (value_ptr_ != nullptr);
 }
 
 }  // namespace memblock
