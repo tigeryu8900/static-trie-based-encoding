@@ -2,7 +2,11 @@
 
 namespace stbe {
 
-Builder::Builder(const std::string& fname, std::vector<std::string>& values) {
+Builder::Builder(uint32_t block_size) : block_size_(block_size) {
+}
+
+Builder::Builder(const std::string& fname, std::vector<std::string>& values,
+                 uint32_t block_size) : block_size_(block_size) {
   initialize(fname);
   add(values);
   finalize();
@@ -15,7 +19,7 @@ void Builder::initialize(const std::string& filename) {
 void Builder::add(const std::string& value) {
   trie_.add(value);
   // check if the trie_ is over estimated size limit, then create a new block.
-  if (trie_.numValues() >= 2) finishBlock();
+  if (trie_.estimatedSize() >= block_size_) finishBlock();
 }
 
 void Builder::add(const std::vector<std::string>& values) {

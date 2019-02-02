@@ -7,10 +7,13 @@
 
 namespace stbe {
 
+constexpr size_t kDefaultBlockSize = 4 * 1024 * 1024;  // 4MB
+
 class Builder{
 private:
   Trie trie_;
   std::ofstream os_;
+  uint32_t block_size_;
   // records offset and num of values in each block.
   std::vector<std::pair<uint32_t, uint32_t>> block_info_;
 
@@ -19,8 +22,9 @@ private:
   void finishBlock();
 
 public:
-  Builder() {}
-  Builder(const std::string& fname, std::vector<std::string>& values);
+  explicit Builder(uint32_t block_size = kDefaultBlockSize);
+  Builder(const std::string& fname, std::vector<std::string>& values,
+          uint32_t block_size = kDefaultBlockSize);
   void initialize(const std::string& filename);
   
   void add(const std::string& value);

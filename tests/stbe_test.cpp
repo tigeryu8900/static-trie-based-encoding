@@ -7,9 +7,7 @@
 #include "stbe.h"
 #include "test_param.h"
 
-
 namespace stbe {
-
 
 class STBETest : public ::testing::TestWithParam<TestParam> {
 };
@@ -28,7 +26,6 @@ TEST_P(STBETest, Decode)
   std::string value;
   for (auto& ori_value : t.input) {
     auto b = decoder.nextValue(value);
-    std::cout << "got: " << value << std::endl; 
     ASSERT_TRUE(b) << "Unexpected end of values.";
     EXPECT_EQ(ori_value, value);
   }

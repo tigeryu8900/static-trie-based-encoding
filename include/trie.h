@@ -8,7 +8,8 @@
 
 #include "util/coding.h"
 
-constexpr int kM = 2;
+constexpr int kMinCommPrefix = 2;
+constexpr float kAvgVarintSize = 2.2;
 
 class TrieNode {
 private:
@@ -27,8 +28,10 @@ public:
   size_t getPosition() {
     return position_;
   }
-  TrieNode* add(const std::string& value, size_t position);
-  // returns pointer to the child just added.
+  // Adds a new value to the trie, returns the last node representing the value
+  // It also accumlates number of new nodes and new value size added.
+  TrieNode* add(const std::string& value, size_t position, size_t& new_nodes, size_t& new_value_size);
+  // Returns pointer to the child just added.
   TrieNode* addChild(std::unique_ptr<TrieNode> child);
 
   void serialize(std::string* buf, size_t parent_pos);
@@ -47,14 +50,19 @@ class Trie {
 private:
   TrieNode root_;
   std::vector<TrieNode*> value_nodes_;
+  size_t num_nodes_ = 1;
+  size_t node_value_size_ = 0;
 public:
   Trie() {}
 
   void add(const std::string& value);
   void add(const std::vector<std::string>& values);
   std::string serialize();
-  size_t numValues() {
+  size_t numValues() const {
     return value_nodes_.size();
+  }
+  size_t estimatedSize() const {
+    return node_value_size_ + size_t((numValues() + num_nodes_ * 2) * kAvgVarintSize);
   }
 
   void reset() {
