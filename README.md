@@ -1,6 +1,6 @@
 # Static Trie-based Encoding: A Compressed Read-Only File Format for Fast Reading
 
-One Paragraph of project description goes here
+This project provides a library that can build a trie data structure from string values and serializes them into files and allows random access to string values compressed in this way.
 
 ## Getting Started
 
@@ -32,9 +32,13 @@ Now, you can run the executables that are created.
 
 You can add another test file in the tests folder and add it to CMakeLists.txt (read the [tutorial](https://cmake.org/cmake-tutorial/) to know how) and make the project, or you can run one of the existing tests.
 
-## Deployment
+## Examples
 
-This project is currently not ready for deployment.
+These projects uses this project as a library.
+
+### [STBE-based Weblog](../../../stbe-based-weblog)
+
+A library and Tools for encoding Apache weblogs and decoding and reading encoded weblog files (tests use [NASA's weblog files](http://ita.ee.lbl.gov/html/contrib/NASA-HTTP.html))
 
 ## Built With
 
