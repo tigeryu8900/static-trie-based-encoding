@@ -62,7 +62,7 @@ public:
     return value_nodes_.size();
   }
   size_t estimatedSize() const {
-    return node_value_size_ + size_t((numValues() + num_nodes_ * 2) * kAvgVarintSize);
+    return node_value_size_ + static_cast<size_t>((numValues() + num_nodes_ * 2) * kAvgVarintSize);
   }
 
   void reset() {
