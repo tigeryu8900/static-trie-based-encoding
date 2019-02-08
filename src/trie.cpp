@@ -95,23 +95,7 @@ std::ostream& operator<< (std::ostream &out, const Trie &trie) {
 }
 
 void Trie::serialize(std::string* buf) {
-  //std::string buf;
-
-  // Placeholder for values offset
-  //PutFixed32(&buf, 0); 
-
-  // Serialize the root_
   root_.serialize(buf, 0);
-  //uint32_t values_offset = buf.size();
-
-  // Serialize value_nodes_
-  //for (auto& n : value_nodes_) {
-  //  PutVarint32(&buf, n->getPosition());
-  //}
-
-  // Write values offset
-  //EncodeFixed32(&buf[0], values_offset);
-  //return buf;
 }
 
 }  // namespace stbe
