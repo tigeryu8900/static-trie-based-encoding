@@ -1,5 +1,4 @@
-#ifndef TRIE_H_INCLUDED
-#define TRIE_H_INCLUDED
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -7,6 +6,8 @@
 #include <vector>
 
 #include "util/coding.h"
+
+namespace stbe {
 
 constexpr int kMinCommPrefix = 2;
 constexpr float kAvgVarintSize = 2.2;
@@ -73,4 +74,4 @@ public:
   friend std::ostream& operator<< (std::ostream &os, const Trie &trie);
 };
 
-#endif  // TRIE_H_INCLUDED
+}  // namespace stbe

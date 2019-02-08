@@ -1,16 +1,17 @@
 #include "memblock.h"
 
-namespace memblock {
+namespace stbe {
 
-Decoder::Decoder(const char* buf, size_t len) {
+BlockDecoder::BlockDecoder(const char* buf, size_t len) {
   reset(buf, len);
 }
 
-Decoder::Decoder(const std::string& buf) : Decoder::Decoder(buf.data(), buf.size()) {}
+BlockDecoder::BlockDecoder(const std::string& buf)
+    : BlockDecoder::BlockDecoder(buf.data(), buf.size()) {}
 
-Decoder::Decoder() {}
+BlockDecoder::BlockDecoder() {}
 
-bool Decoder::reset(const char* buf, size_t len) {
+bool BlockDecoder::reset(const char* buf, size_t len) {
   if (buf == nullptr || len <= sizeof(uint32_t)) return false;
   buf_ = buf;
   limit_ = buf_ + len;
@@ -19,7 +20,7 @@ bool Decoder::reset(const char* buf, size_t len) {
   return true;
 }
 
-bool Decoder::nextValue(std::string& value) {
+bool BlockDecoder::nextValue(std::string& value) {
   uint32_t node_pos;
   size_t total_size = 0;
 
@@ -50,7 +51,7 @@ bool Decoder::nextValue(std::string& value) {
   return true;
 }
 
-bool Decoder::skip(uint32_t num) {
+bool BlockDecoder::skip(uint32_t num) {
   uint32_t node_pos;
   for (uint32_t i = 0; i < num; ++i) {
     if (value_ptr_ == nullptr) return false;
@@ -60,5 +61,5 @@ bool Decoder::skip(uint32_t num) {
   return (value_ptr_ != nullptr);
 }
 
-}  // namespace memblock
+}  // namespace stbe
 

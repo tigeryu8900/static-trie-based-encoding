@@ -84,7 +84,6 @@ Decoder::Decoder(const std::string& fname) : inf_(fname, std::ifstream::binary) 
 }
 
 bool Decoder::loadBlockIndex() {
-std::cout << "Decoder::cacheIndex called" << std::endl;
   // return true if the index block is already cached
   if (blocks_info_.size() > 0) return true;
   if (!loadBlock(index_block_offset_, file_size_)) return false;
@@ -104,10 +103,6 @@ std::cout << "Decoder::cacheIndex called" << std::endl;
     if (ptr == nullptr) break;
     total_records += blocks_info_[i].num_records;
     blocks_info_[i].accumlated_records = total_records;
-  }
-std::cout << "blocks_info_: " << blocks_info_.size() << std::endl;
-  for (auto& i : blocks_info_) {
-std::cout << "" << i.offset << ' ' << i.num_records << ' ' << i.accumlated_records << std::endl;
   }
   return true;
 }

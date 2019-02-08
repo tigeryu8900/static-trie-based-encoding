@@ -8,7 +8,7 @@
 #include "memblock.h"
 #include "test_param.h"
 
-namespace memblock {
+namespace stbe {
 
 class TrieTest : public ::testing::TestWithParam<TestParam> {
 };
@@ -31,7 +31,7 @@ TEST_P(TrieTest, Decode)
 
   trie.add(t.input);
   std::string buf = trie.serialize();
-  Decoder decoder(buf);
+  BlockDecoder decoder(buf);
   std::string value;
   for (auto& ori_value : t.input) {
     ASSERT_TRUE(decoder.nextValue(value)) << "Unexpected end of values.";
@@ -42,4 +42,4 @@ TEST_P(TrieTest, Decode)
 
 INSTANTIATE_TEST_SUITE_P(Trie, TrieTest, ::testing::ValuesIn(tests));
 
-}  // namespace memblock
+}  // namespace stbe

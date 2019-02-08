@@ -1,5 +1,7 @@
 #include "trie.h"
 
+namespace stbe {
+
 TrieNode* TrieNode::add(const std::string& value, size_t position, size_t& new_nodes, size_t& new_value_size) {
   // search for child with the same prefix
   size_t remain_size = value.size() - position;
@@ -117,3 +119,4 @@ std::string Trie::serialize() {
   return buf;
 }
 
+}  // namespace stbe

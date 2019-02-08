@@ -1,5 +1,4 @@
-#ifndef MEMBLOCK_H_INCLUDED
-#define MEMBLOCK_H_INCLUDED
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -9,9 +8,9 @@
 #include "util/coding.h"
 #include "trie.h"
 
-namespace memblock {
+namespace stbe {
 
-class Decoder {
+class BlockDecoder {
 private:
   const char* buf_ = nullptr;
   const char* limit_ = nullptr;
@@ -19,9 +18,9 @@ private:
   const char* value_ptr_ = nullptr;
 
 public:
-  explicit Decoder(const std::string& buf);
-  Decoder(const char* buf, size_t len);
-  Decoder();
+  explicit BlockDecoder(const std::string& buf);
+  BlockDecoder(const char* buf, size_t len);
+  BlockDecoder();
 
   bool reset(const char* buf, size_t len);
 
@@ -34,8 +33,4 @@ public:
   bool skip(uint32_t num);
 };
 
-
-}  // namespace memblock
-
-#endif  // MEMBLOCK_H_INCLUDED
-
+}  // namespace stbe

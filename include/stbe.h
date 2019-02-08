@@ -1,5 +1,4 @@
-#ifndef STBE_H_INCLUDED
-#define STBE_H_INCLUDED
+#pragma once
 
 #include <fstream>
 
@@ -35,7 +34,7 @@ public:
 	
 class Decoder {
 private:
-  memblock::Decoder decoder_;
+  BlockDecoder decoder_;
   std::ifstream inf_;
   std::string buf_;  // data buffer for decoder
   uint32_t index_block_offset_ = 0;
@@ -73,6 +72,4 @@ public:
 };
 
 }  // namespace stbe
-
-#endif  // STBE_H_INCLUDED
 
