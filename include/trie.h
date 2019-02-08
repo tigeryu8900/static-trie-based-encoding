@@ -10,7 +10,22 @@
 namespace stbe {
 
 constexpr int kMinCommPrefix = 2;
-constexpr float kAvgVarintSize = 2.2;
+constexpr float kAvgVarintSize = 3.0;
+
+class TrieNode;
+
+// TriePosition represent an handle of string after added to a Trie.
+class TriePosition {
+  friend class Trie;
+private:
+  TrieNode* trie_node_;
+  // private constructor for Trie to make instance.
+  explicit TriePosition(TrieNode* trie_node) : trie_node_(trie_node) {}
+
+public:
+  TriePosition() : trie_node_(nullptr) {}
+  size_t getPosition() const;
+};
 
 class TrieNode {
 private:
@@ -39,7 +54,7 @@ public:
 
 //  void serialize(std::ostream& os, size_t parent_pos, uint32_t& pos);
 
-  void reset() {
+  void clear() {
     value_.clear();
     children_.clear();
     position_ = 0;
@@ -50,25 +65,20 @@ public:
 class Trie {
 private:
   TrieNode root_;
-  std::vector<TrieNode*> value_nodes_;
   size_t num_nodes_ = 1;
   size_t node_value_size_ = 0;
 public:
   Trie() {}
 
-  void add(const std::string& value);
+  TriePosition add(const std::string& value);
   void add(const std::vector<std::string>& values);
-  std::string serialize();
-  size_t numValues() const {
-    return value_nodes_.size();
-  }
+  void serialize(std::string* buf);
   size_t estimatedSize() const {
-    return node_value_size_ + static_cast<size_t>((numValues() + num_nodes_ * 2) * kAvgVarintSize);
+    return node_value_size_ + static_cast<size_t>((num_nodes_ * 2) * kAvgVarintSize);
   }
 
-  void reset() {
-    value_nodes_.clear();
-    root_.reset();
+  void clear() {
+    root_.clear();
   }
 
   friend std::ostream& operator<< (std::ostream &os, const Trie &trie);

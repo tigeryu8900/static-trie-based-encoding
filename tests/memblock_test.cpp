@@ -2,6 +2,7 @@
 #include <sstream>
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "gtest/gtest.h"
 #include "trie.h"
@@ -27,17 +28,19 @@ TEST_P(TrieTest, Serialization)
 TEST_P(TrieTest, Decode)
 {
   const TestParam& t = GetParam();
-  Trie trie;
+  BlockEncoder<std::string> encoder;
+  for (auto& v : t.input) {
+    encoder.add(v);
+  }
+  std::string buf = encoder.serialize();
 
-  trie.add(t.input);
-  std::string buf = trie.serialize();
-  BlockDecoder decoder(buf);
+  BlockDecoder<std::string> decoder(buf);
   std::string value;
   for (auto& ori_value : t.input) {
-    ASSERT_TRUE(decoder.nextValue(value)) << "Unexpected end of values.";
+    ASSERT_TRUE(decoder.nextRecord(value)) << "Unexpected end of values.";
     EXPECT_EQ(ori_value, value);
   }
-  EXPECT_FALSE(decoder.nextValue(value)) << "Too many values than expected.";
+  EXPECT_FALSE(decoder.nextRecord(value)) << "Too many values than expected.";
 }
 
 INSTANTIATE_TEST_SUITE_P(Trie, TrieTest, ::testing::ValuesIn(tests));

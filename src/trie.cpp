@@ -2,6 +2,12 @@
 
 namespace stbe {
 
+
+size_t TriePosition::getPosition() const {
+  return trie_node_->getPosition();
+}
+
+
 TrieNode* TrieNode::add(const std::string& value, size_t position, size_t& new_nodes, size_t& new_value_size) {
   // search for child with the same prefix
   size_t remain_size = value.size() - position;
@@ -71,22 +77,10 @@ void TrieNode::serialize(std::string* buf, size_t parent_pos) {
     c->serialize(buf, position_);
   }
 }
-/*
-void TrieNode::serialize(std::ostream& os, size_t parent_pos, uint32_t& pos) {
-  position_ = pos;
-  std::string buf;
-  PutVarint32Varint32(&buf, parent_pos, value_.size());
-  //buf.append(value_);
-  os << buf << value_;
-  pos += buf.size() + value_.size();
-  for (auto& c : children_) {
-    c->serialize(os, position_, pos);
-  }
-}
-*/
 
-void Trie::add(const std::string& value) {
-  value_nodes_.push_back(root_.add(value, 0, num_nodes_, node_value_size_));
+TriePosition Trie::add(const std::string& value) {
+  TrieNode* node = root_.add(value, 0, num_nodes_, node_value_size_);
+  return TriePosition{node};
 }
 
 void Trie::add(const std::vector<std::string>& values) {
@@ -94,29 +88,30 @@ void Trie::add(const std::vector<std::string>& values) {
     add(s);
   }
 }
+
 std::ostream& operator<< (std::ostream &out, const Trie &trie) {
   trie.root_.print(out, 0);
   return out;
 }
 
-std::string Trie::serialize() {
-  std::string buf;
+void Trie::serialize(std::string* buf) {
+  //std::string buf;
 
   // Placeholder for values offset
-  PutFixed32(&buf, 0); 
+  //PutFixed32(&buf, 0); 
 
   // Serialize the root_
-  root_.serialize(&buf, 0);
-  uint32_t values_offset = buf.size();
+  root_.serialize(buf, 0);
+  //uint32_t values_offset = buf.size();
 
   // Serialize value_nodes_
-  for (auto& n : value_nodes_) {
-    PutVarint32(&buf, n->getPosition());
-  }
+  //for (auto& n : value_nodes_) {
+  //  PutVarint32(&buf, n->getPosition());
+  //}
 
   // Write values offset
-  EncodeFixed32(&buf[0], values_offset);
-  return buf;
+  //EncodeFixed32(&buf[0], values_offset);
+  //return buf;
 }
 
 }  // namespace stbe

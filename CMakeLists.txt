@@ -34,9 +34,7 @@ endif()
 
 add_library(libstbe
 	src/util/coding.cpp
-	src/trie.cpp
-	src/memblock.cpp
-	src/stbe.cpp)
+	src/trie.cpp)
 
 # Now simply link against gtest or gtest_main as needed. Eg
 
