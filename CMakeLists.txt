@@ -32,7 +32,7 @@ if (CMAKE_VERSION VERSION_LESS 2.8.11)
   include_directories("${gtest_SOURCE_DIR}/include")
 endif()
 
-add_library(libstbe
+add_library(stbe
 	src/util/coding.cpp
 	src/trie.cpp)
 
@@ -47,12 +47,14 @@ include_directories("${gtest_SOURCE_DIR}/include" include src)
 add_executable(memblock_test
     tests/memblock_test.cpp
 )
-target_link_libraries(memblock_test libstbe gtest gtest_main)
+target_link_libraries(memblock_test stbe gtest gtest_main)
+message( "   tigerdebug ${gtest}" )
+
 add_test(NAME memblock_test COMMAND memblock_test)
 
 add_executable(stbe_test
   tests/stbe_test.cpp
 )
-target_link_libraries(stbe_test libstbe gtest gtest_main)
+target_link_libraries(stbe_test stbe gtest gtest_main)
 add_test(NAME stbe_test COMMAND stbe_test)
 
