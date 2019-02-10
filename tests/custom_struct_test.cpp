@@ -28,7 +28,7 @@ template<>
 class recordMarshaller<Record> {
 public:
   static float avgSize() {
-    return kAvgVarintSize * 3;  // stores 3 varint per record
+    return kAvgVarintSize * 3;  // stores 3 varints per record
   }
   static void add2Trie(TrieValueEncoder& encoder, const Record& r) {
     encoder.addString2Trie(r.category);
@@ -41,19 +41,16 @@ public:
   }
 
   static bool decode(TrieValueDecoder& decoder, Record& r) {
-    bool res = decoder.decodeString(r.category);
-    res &= decoder.decodeUint32(r.total_items);
-    res &= decoder.decodeString(r.contact_phone);
-    return res;
+    return decoder.decodeString(r.category) &&
+           decoder.decodeUint32(r.total_items) &&
+           decoder.decodeString(r.contact_phone);
   }
   static bool skip(TrieValueDecoder& decoder) {
-    bool res = decoder.skipString();
-    res &= decoder.skipUint32();
-    res &= decoder.skipString();
-    return res;
+    return decoder.skipString() &&
+           decoder.skipUint32() &&
+           decoder.skipString();
   }
 };
-
 
 
 TEST(CustomStructTest, TestCustomStruct)
@@ -85,8 +82,8 @@ TEST(CustomStructTest, TestCustomStruct)
   for (uint32_t i = 0 ; i < decoder.totalRecords(); ++i) {
     EXPECT_EQ(test_data[i], decoder[i]);
   }
-
-  EXPECT_EQ(Record{}, decoder[decoder.totalRecords()]) << "Too many values than expected.";
+  Record e{};
+  EXPECT_EQ(e, decoder[decoder.totalRecords()]) << "Too many values than expected.";
 }
 
 }  // namespace stbe

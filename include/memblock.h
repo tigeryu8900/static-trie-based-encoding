@@ -29,7 +29,7 @@ public:
 template <typename RecordType>
 class recordMarshaller;
 
-// Specialize marshaller for RecordType == std::string.
+// Specialized marshaller for RecordType == std::string.
 template <>
 class recordMarshaller<std::string> {
 public:
@@ -82,7 +82,7 @@ public:
     RecordEncoder::add2Trie(*this, records_.back());
   }
 
-  std::string serialize();
+  const std::string& serialize();
 
   size_t numRecords() {
     return records_.size();
@@ -116,7 +116,9 @@ public:
   // TrieValueDecoder functions.
   bool decodeString(std::string& value) override;
   bool decodeUint32(uint32_t& value) override {
-    return nullptr != GetVarint32Ptr(record_ptr_, limit_, &value);
+    if (record_ptr_ == nullptr || record_ptr_ >= limit_) return false;
+    record_ptr_ = GetVarint32Ptr(record_ptr_, limit_, &value);
+    return record_ptr_ != nullptr;
   }
   bool skipUint32() override {
     uint32_t dummy;
@@ -137,7 +139,7 @@ public:
 // Templates implementation
 
 template <typename T, typename RecordEncoder>
-std::string BlockEncoder<T, RecordEncoder>::serialize() {
+const std::string& BlockEncoder<T, RecordEncoder>::serialize() {
   buf_.clear();
   // Placeholder for recordss offset
   PutFixed32(&buf_, 0); 
@@ -148,13 +150,14 @@ std::string BlockEncoder<T, RecordEncoder>::serialize() {
 
   // Serialize records
   for (int i = 0; i < records_.size(); ++i) {
+    cur_positions_ = &positions_[i];
     RecordEncoder::encode(*this, records_[i]);
   }
 
   // Write records offset
   EncodeFixed32(&buf_[0], records_offset);
 
-  return std::move(buf_);
+  return buf_;
 }
 
 
@@ -211,7 +214,7 @@ bool BlockDecoder<T, RecordDecoder>::decodeString(std::string& value) {
 template <typename T, typename RecordDecoder>
 bool BlockDecoder<T, RecordDecoder>::nextRecord(T& record) {
   // return false when hit the end.
-  if (record_ptr_ == nullptr) return false;
+  if (record_ptr_ == nullptr || record_ptr_ >= limit_) return false;
 
   // Get start position from record_ptr_, and advance it to next record.
   if (!RecordDecoder::decode(*this, record)) return false;

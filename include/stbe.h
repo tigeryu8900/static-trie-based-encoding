@@ -219,9 +219,7 @@ bool Decoder<T, RecordDecoder>::nextRecord(T& record) {
   // return false if the file cursor has already passed the last element
   bool has_record = decoder_.nextRecord(record);
   if (has_record) return true;
-
   if (!loadDataBlock(current_block_num_ + 1)) return false;
-
   return decoder_.nextRecord(record);
 }
 
