@@ -22,11 +22,11 @@ TEST_P(STBETest, Decode)
   builder.finalize();
  
   Decoder<std::string> decoder("test_file");
-  ASSERT_EQ(t.input.size(), decoder.totalRecords()) << "Unmatched # of records.";
+  ASSERT_EQ(t.input.size(), decoder.totalRecords())
+      << "Unmatched # of records.";
   std::string value;
   for (auto& ori_value : t.input) {
-    auto b = decoder.nextRecord(value);
-    ASSERT_TRUE(b) << "Unexpected end of values.";
+    ASSERT_TRUE(decoder.nextRecord(value)) << "Unexpected end of values.";
     EXPECT_EQ(ori_value, value);
   }
   EXPECT_FALSE(decoder.nextRecord(value)) << "Too many values than expected.";

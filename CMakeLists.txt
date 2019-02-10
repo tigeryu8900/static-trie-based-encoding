@@ -58,3 +58,9 @@ add_executable(stbe_test
 target_link_libraries(stbe_test stbe gtest gtest_main)
 add_test(NAME stbe_test COMMAND stbe_test)
 
+add_executable(custom_struct_test
+  tests/custom_struct_test.cpp
+)
+target_link_libraries(custom_struct_test stbe gtest gtest_main)
+add_test(NAME custom_struct_test COMMAND custom_struct_test)
+
