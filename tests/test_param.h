@@ -10,26 +10,75 @@ struct TestParam {
   std::string result;
 };
 
+
 TestParam tests[] = {
-    { std::vector<std::string>{"abc", "abd"},
+     { {},  // no values
+      R"(0: 
+)"
+     },
+     { {""},  // single empty value
+      R"(0: 
+  1: 
+)"
+     },
+     { {"", "", ""},  // multiple empty values
+      R"(0: 
+  1: 
+)"
+     },
+     { {"abcc"},  // single value
+      R"(0: 
+  1: abcc
+)"
+    },
+     { {"abcc", "abcc", "abcc"},  // duplicated values
+      R"(0: 
+  1: abcc
+)"
+    },
+    { {"abc", "abd"},  // two values with common prefix
       R"(0: 
   1: ab
     2: c
     2: d
 )"
     },
-    { std::vector<std::string>{"a", "aa", "abc", "aabc", "abcc"},
+    { {"abc", "akk"},  // two values with common prefix less than threshold
       R"(0: 
-  1: a
-  1: aa
-    2: bc
   1: abc
-    2: c
+  1: akk
 )"
     },
-    { std::vector<std::string>{"abcc"},
+    { {"abc", "def"},  // two values with no common prefix
       R"(0: 
-  1: abcc
+  1: abc
+  1: def
+)"
+    },
+    { {"a", "aa", "abc", "aabc", "abcc"},  // multi-values
+      R"(0: 
+  1: a
+    2: a
+      3: bc
+    2: bc
+      3: c
+)"
+    },
+    { {"a", "aa", "abc", "aabc", "", "abcc"},  // multi-values with empty string
+      R"(0: 
+  1: a
+    2: a
+      3: bc
+    2: bc
+      3: c
+  1: 
+)"
+    },
+   { {"128.217.62.224", "128.217.62.24", "128.217.62.2"},
+      R"(0: 
+  1: 128.217.62.2
+    2: 24
+    2: 4
 )"
     }};
 

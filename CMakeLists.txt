@@ -40,7 +40,7 @@ add_library(stbe
 
 # Setup testing
 enable_testing()
-#find_package(GTest REQUIRED)
+find_package(Threads REQUIRED)
 include_directories("${gtest_SOURCE_DIR}/include" include src)
 
 # Add test cpp file

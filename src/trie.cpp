@@ -11,7 +11,7 @@ size_t TriePosition::getPosition() const {
 TrieNode* TrieNode::add(const std::string& value, size_t position, size_t& new_nodes, size_t& new_value_size) {
   // search for child with the same prefix
   size_t remain_size = value.size() - position;
-
+  TrieNode* best_fully_matched_node = nullptr;
   for (auto& node : children_) {
     auto& val = node->getVal();
     // Calculate common prefix of val and value.
@@ -22,35 +22,40 @@ TrieNode* TrieNode::add(const std::string& value, size_t position, size_t& new_n
       com_prex++; ++p; ++q;
     }
 
-    if (com_prex >= kMinCommPrefix) {
-      if (val.size() > com_prex) {
-        // split val
-        auto new_node = std::make_unique<TrieNode>(val.substr(0, com_prex));
-        node->setVal(val.substr(com_prex));
-        new_node->addChild(std::move(node));
-        node = std::move(new_node);
+    if (com_prex >= kMinCommPrefix && com_prex < val.size()) {
+      // split node
+      auto new_node = std::make_unique<TrieNode>(val.substr(0, com_prex));
+      node->setVal(val.substr(com_prex));
+      new_node->addChild(std::move(node));
+      node = std::move(new_node);
+      new_nodes++;
+      if (remain_size == com_prex) {
+        return node.get();
+      } else {
+        auto new_child = std::make_unique<TrieNode>(value.substr(position + com_prex));
         new_nodes++;
-        if (remain_size == com_prex) {
-          return node.get();
-        } else {
-          auto new_child = std::make_unique<TrieNode>(value.substr(position + com_prex));
-          new_nodes++;
-          new_value_size += remain_size - com_prex;
-          return node->addChild(std::move(new_child));
-        }
-      } else { // val.size() == com_prex
-        // add a child to node
-        if (remain_size == val.size()) return node.get();
-        return node->add(value, position + com_prex, new_nodes, new_value_size);
+        new_value_size += remain_size - com_prex;
+        return node->addChild(std::move(new_child));
       }
-    } else if (com_prex == remain_size) {
-      // exact match
-      return node.get();
     }
+    if (com_prex == val.size()) {
+      // fully matched node
+      if (remain_size == val.size()) {
+        // exact match
+        return node.get();
+      } else {
+        if (best_fully_matched_node == nullptr || val.size() > best_fully_matched_node->getVal().size())
+          best_fully_matched_node = node.get();
+      }
+    }
+  }
+  if (best_fully_matched_node != nullptr) {
+    size_t new_position = position + best_fully_matched_node->getVal().size();
+    return best_fully_matched_node->add(value, new_position, new_nodes, new_value_size);
   }
 
   // Base case: no match
-  children_.push_back(std::make_unique<TrieNode>(value.substr(position)));
+  children_.emplace_back(std::make_unique<TrieNode>(value.substr(position)));
   new_nodes++;
   new_value_size += remain_size;
   return children_.back().get();
