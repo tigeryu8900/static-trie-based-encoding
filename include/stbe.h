@@ -66,10 +66,12 @@ public:
   explicit Decoder(const std::string& fname);
 
   size_t totalRecords() {
+    if (blocks_info_.empty()) {
+      return 0;
+    }
     return blocks_info_.back().accumlated_records;
   }
   bool nextRecord(T& record);
-  bool skip(uint32_t num);
   const T operator[](const int index);
 };
 
@@ -162,7 +164,9 @@ Decoder<T, RecordDecoder>::Decoder(const std::string& fname) : inf_(fname, std::
   char buf[sizeof(uint32_t)];
   inf_.read(buf, sizeof(uint32_t));
   index_block_offset_ = DecodeFixed32(buf);
-  loadBlockIndex();
+  if (!loadBlockIndex()) {
+    std::cerr << "Faild to load index block from file." << std::endl;
+  }
   inf_.seekg(cur, std::ifstream::beg);
 }
 
@@ -182,9 +186,9 @@ bool Decoder<T, RecordDecoder>::loadBlockIndex() {
   uint32_t total_records = 0;
   for (int i = 0; i < num_blocks; ++i) {
     ptr = GetVarint32Ptr(ptr, limit, &blocks_info_[i].offset);
-    if (ptr == nullptr) break;
+    if (ptr == nullptr) return false;
     ptr = GetVarint32Ptr(ptr, limit, &blocks_info_[i].num_records);
-    if (ptr == nullptr) break;
+    if (ptr == nullptr) return false;
     total_records += blocks_info_[i].num_records;
     blocks_info_[i].accumlated_records = total_records;
   }
@@ -224,11 +228,6 @@ bool Decoder<T, RecordDecoder>::nextRecord(T& record) {
 }
 
 template <typename T, typename RecordDecoder>
-bool Decoder<T, RecordDecoder>::skip(uint32_t num) {
-  return decoder_.skip(num);
-}
-
-template <typename T, typename RecordDecoder>
 uint32_t Decoder<T, RecordDecoder>::locateBlock(uint32_t record_index, uint32_t begin, uint32_t end) const {
   if (begin == end) {
     return record_index < blocks_info_[begin].accumlated_records 
@@ -244,17 +243,20 @@ uint32_t Decoder<T, RecordDecoder>::locateBlock(uint32_t record_index, uint32_t 
 
 template <typename T, typename RecordDecoder>
 const T Decoder<T, RecordDecoder>::operator[](const int index) {
-  uint32_t block_num = locateBlock(index);
   T record;
-  // returns empty record if index out of range.
-  if (block_num >= blocks_info_.size() || !loadDataBlock(block_num)) {
+  if (blocks_info_.empty()) return record;  // No blocks
+
+  uint32_t block_num = locateBlock(index);
+  // returns empty record if index out of range or faild to load new block.
+  if (block_num >= blocks_info_.size() || 
+      (block_num != current_block_num_ && !loadDataBlock(block_num))) {
     return record;
   }
 
   uint32_t index_offset = index;
   index_offset -= blocks_info_[block_num].accumlated_records -
                   blocks_info_[block_num].num_records;
-  if (skip(index_offset)) { 
+  if (decoder_.go(index_offset)) { 
     nextRecord(record);
   }
   return record;

@@ -105,8 +105,9 @@ class BlockDecoder : public TrieValueDecoder {
 private:
   const char* buf_ = nullptr;
   const char* limit_ = nullptr;
-  uint32_t records_offset_ = 0;
   const char* record_ptr_ = nullptr;
+  uint32_t records_offset_ = 0;
+  uint32_t current_ind_ = 0;
 
 public:
   explicit BlockDecoder(const std::string& buf);
@@ -132,8 +133,8 @@ public:
 
   // get the next record.
   bool nextRecord(T& record);
-  // skip n records
-  bool skip(uint32_t num);
+  // goto nth record, the following call to nextRecord() returns nth record.
+  bool go(uint32_t ind);
 };
 
 // Templates implementation
@@ -179,6 +180,7 @@ bool BlockDecoder<T, RecordDecoder>::reset(const char* buf, size_t len) {
   buf_ = buf;
   limit_ = buf_ + len;
   records_offset_ = DecodeFixed32(buf_);
+  current_ind_ = 0;
   record_ptr_ = buf_ + records_offset_;
   return true;
 }
@@ -216,6 +218,7 @@ bool BlockDecoder<T, RecordDecoder>::nextRecord(T& record) {
   // return false when hit the end.
   if (record_ptr_ == nullptr || record_ptr_ >= limit_) return false;
 
+  ++current_ind_;
   // Get start position from record_ptr_, and advance it to next record.
   if (!RecordDecoder::decode(*this, record)) return false;
 
@@ -226,9 +229,14 @@ bool BlockDecoder<T, RecordDecoder>::nextRecord(T& record) {
 }
 
 template <typename T, typename RecordDecoder>
-bool BlockDecoder<T, RecordDecoder>::skip(uint32_t num) {
+bool BlockDecoder<T, RecordDecoder>::go(uint32_t ind) {
+  if (current_ind_ > ind) {
+    // rewind if we alrealy passed ind
+    current_ind_ = 0;
+    record_ptr_ = buf_ + records_offset_;
+  }
   uint32_t node_pos;
-  for (uint32_t i = 0; i < num; ++i) {
+  while (current_ind_++ < ind) {
     if (record_ptr_ == nullptr || !RecordDecoder::skip(*this)) return false;
   }
   return (record_ptr_ != nullptr);
